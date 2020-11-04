@@ -1,0 +1,58 @@
+[
+  {
+    "name": "cvm-k8s-release-1",
+    "ip": "49.234.149.88",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+    "name": "cvm-k8s-release-2",
+    "ip": "81.69.173.128",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+    "name": "cvm-k8s-release-3",
+    "ip": "81.69.177.49",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+    "name": "cvm-k8s-release-4",
+    "ip": "81.69.177.196",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  }, {
+    "name": "cvm-k8s-release-5",
+    "ip": "129.211.96.47",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/cvm_k8s_pud.pem"
+  },{
+    "name": "cvm-k8s-release-6",
+    "ip": "122.51.35.36",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/cvm_k8s_pud.pem"
+  },{
+  "name": "cvm-k8s-release-7",
+  "ip": "49.234.129.155",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+},{
+  "name": "cvm-k8s-release-8",
+  "ip": "49.234.129.133",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+},{
+  "name": "cvm-k8s-release-9",
+  "ip": "49.234.155.33",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+},{
+  "name": "cvm-k8s-release-10",
+  "ip": "49.234.149.89",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+},{
+  "name": "cvm-k8s-release-11",
+  "ip": "122.152.204.89",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+}
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "name": "cvm-k8s-test-1",
+    "ip": "49.234.130.167",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+    "name": "cvm-k8s-test-2",
+    "ip": "49.234.143.98",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+    "name": "cvm-k8s-test-3",
+    "ip": "81.69.191.175",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/cvm_k8s_test.pem"
+  },{
+    "name": "cvm-k8s-test-4",
+    "ip": "106.54.155.167",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/cvm_k8s_test.pem"
+  }, {
+    "name": "cvm-k8s-test-5",
+    "ip": "106.54.144.221",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/cvm_k8s_test.pem"
+  },{
+    "name": "cvm-k8s-test-6",
+    "ip": "49.234.148.57",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/cvm_k8s_test.pem"
+  }
+]

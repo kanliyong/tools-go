@@ -15,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func filterClusters(env string) []*Cluster{
+func filterClusters(env string) []*Cluster {
 	switch env {
 	case "all":
 		return ClusterArray
@@ -47,8 +47,8 @@ func FindDeploy(srv string, f bool, show bool, env string) (result string, err e
 		deployName := re.FindString(string(output))
 		if deployName != "" {
 			log.Printf("%s", deployName)
-			if show == true{
-			}else{
+			if show == true {
+			} else {
 				ScaleZero(cluster, deployName, f)
 			}
 		}
@@ -69,10 +69,10 @@ func ScaleZero(cluster *Cluster, svc string, f bool) {
 		"--replicas=0",
 	}
 
-	if f == true{
+	if f == true {
 		doScale(args)
 
-	}else{
+	} else {
 		var input string
 		fmt.Printf("Are you sure sacle to 0 depley=%s,cluser=%v ? Y/N \n", svc, cluster)
 		fmt.Scanf("%s", &input)
@@ -82,14 +82,14 @@ func ScaleZero(cluster *Cluster, svc string, f bool) {
 	}
 }
 
-func doScale(args []string){
+func doScale(args []string) {
 	output, err := exec.Command("kubectl", args...).Output()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(string(output))
 }
-func doDeleteDocument(coll *mongo.Collection, result *bson.M){
+func doDeleteDocument(coll *mongo.Collection, result *bson.M) {
 	deleteReuslt, err := coll.DeleteOne(context.TODO(), bson.D{{"_id", (*result)["_id"]}})
 	if err != nil {
 		panic(err)
@@ -130,26 +130,25 @@ func RmMongo(svc string, f bool, show bool, env string) {
 		}
 
 		deployEnv := result["deployenv"].(string)
-		if env == "all"{
+		if env == "all" {
 
-		}else if env == "test" && !strings.Contains(deployEnv,"test"){
+		} else if env == "test" && !strings.Contains(deployEnv, "test") {
 			continue
-		}else if env == "stage" && !strings.Contains(deployEnv,"proenv"){
+		} else if env == "stage" && !strings.Contains(deployEnv, "proenv") {
 			continue
-		}else if env == "product"  && strings.Contains(deployEnv,"release"){
+		} else if env == "product" && strings.Contains(deployEnv, "release") {
 			continue
 		}
 
-
-		r,_ := json.MarshalIndent(result, "", "\t")
+		r, _ := json.MarshalIndent(result, "", "\t")
 		log.Println(string(r))
 
-		if show == true{
+		if show == true {
 
-		}else{
-			if f == true{
+		} else {
+			if f == true {
 				doDeleteDocument(coll, &result)
-			}else{
+			} else {
 				fmt.Printf("Are you sure delete document %s; Y/N \n", result["_id"])
 				fmt.Scanf("%s", &input)
 				if input == "Y" {
@@ -159,6 +158,3 @@ func RmMongo(svc string, f bool, show bool, env string) {
 		}
 	}
 }
-
-
-

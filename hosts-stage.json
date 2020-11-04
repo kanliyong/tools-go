@@ -1,0 +1,23 @@
+[
+  {
+    "name": "cvm-k8s-pre-1",
+    "ip": "115.159.63.103",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+    "name": "cvm-k8s-pre-2",
+    "ip": "115.159.63.179",
+    "user": "ubuntu",
+    "credit": "~/data/k8s/doorgod"
+  },{
+  "name": "cvm-k8s-pre-3",
+  "ip": "122.51.247.99",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+},{
+  "name": "cvm-k8s-pre-4",
+  "ip": "175.24.249.170",
+  "user": "ubuntu",
+  "credit": "~/data/k8s/cvm_k8s_pud.pem"
+}
+]

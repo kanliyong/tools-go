@@ -2,3 +2,5 @@
 kubeconfig
 vendor
 go.sum
+main
+nodedisk
