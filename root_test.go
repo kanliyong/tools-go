@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"tools/cmd"
 )
 
 // func TestScaleZero(t *testing.T) {
@@ -11,5 +10,6 @@ import (
 // }
 
 func TestMongo(t *testing.T) {
-	cmd.RmMongo("iom-max-vue")
+	tt := parseTime("10/Jun/2020:23:55:50 +0800")
+	println(tt)
 }
