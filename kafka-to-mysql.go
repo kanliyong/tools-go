@@ -2,16 +2,30 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	_ "github.com/go-sql-driver/mysql"
+	//"github.com/pkg/profile"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 )
+/**
+docker build -t ccr.ccs.tencentyun.com/eqxiu/kafka-to-mysql -f kafka-to-mysql.Dockerfile .
+docker push ccr.ccs.tencentyun.com/eqxiu/kafka-to-mysql
 
+
+
+./kafaka-to-mysql -servers="hadoop104.eqxiu.com:9092,hadoop105.eqxiu.com:9092,hadoop106.eqxiu.com:9092" \
+-group_id=kafka-to-mysql \
+-topic="gateway_original_show" \
+-dsn="root:Eqxiu@2019@tcp(10.0.10.49)/nginx?charset=utf8mb4&collation=utf8mb4_general_ci" \
+-table="waf_show_log"
+
+*/
 func parseTime(input string) time.Time {
 	t, err := time.Parse("02/Jan/2006:15:04:05 -0700", input)
 	if err != nil {
@@ -21,10 +35,28 @@ func parseTime(input string) time.Time {
 }
 
 var db *sql.DB
+var (
+	servers string
+	group_id string
+	topic string
+	DSN string
+	table string
+)
 
 func init(){
+
+	flag.StringVar(&servers,
+		"servers",
+		"hadoop104.eqxiu.com:9092,hadoop105.eqxiu.com:9092,hadoop106.eqxiu.com:9092",
+		"kafka bootstrap servers")
+	flag.StringVar(&group_id, "group_id","group_id_test", "kafka consumer group id")
+	flag.StringVar(&topic, "topic","topic_name", "kafka consumer topic")
+	flag.StringVar(&DSN, "dsn","root:Eqxiu@2019@tcp(10.0.10.49)/nginx?charset=utf8mb4&collation=utf8mb4_general_ci", "mysql DSN")
+	flag.StringVar(&table, "table","waf_show_log","table name")
+	flag.Parse()
+
 	var err error
-	db, err = sql.Open("mysql", "root:Eqxiu@2019@tcp(10.0.10.49)/nginx?charset=utf8mb4&collation=utf8mb4_general_ci")
+	db, err = sql.Open("mysql", DSN)
 	if err != nil {
 		panic(err)
 	}
@@ -35,10 +67,7 @@ func init(){
 	db.SetMaxIdleConns(10)
 }
 func insertBatch(array []NginxLog) {
-
-
-
-	sqlStr := `insert into waf_show_log 
+	sqlStr := fmt.Sprintf(`insert into %s 
     (
     create_datetime,
     host,
@@ -54,7 +83,8 @@ func insertBatch(array []NginxLog) {
     tracker_user_id,
     remote_addr
     )
-    values `
+    values `,table)
+
 	vals := []interface{}{}
 
 	for _, l := range array {
@@ -70,6 +100,8 @@ func insertBatch(array []NginxLog) {
 	if err != nil {
 		panic(err)
 	}
+	defer stmt.Close()
+
 
 	//prepare the statement
 	tx, err := db.Begin()
@@ -87,16 +119,13 @@ func insertBatch(array []NginxLog) {
 
 	err = tx.Commit()
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 
-	err = stmt.Close()
-	if err != nil {
-		panic(err)
-	}
+	log.Printf("insert %d", len(array))
 }
 
-var array []NginxLog
+
 
 type NginxLog struct {
 	RemoteIp         string
@@ -115,7 +144,7 @@ type NginxLog struct {
 	Tracker          string
 }
 
-func onMessage(e *kafka.Message) {
+func onMessage(e *kafka.Message) NginxLog {
 
 	s := string(e.Value)
 	rs := strings.Split(s, "#|#")
@@ -140,12 +169,7 @@ func onMessage(e *kafka.Message) {
 		UpstreamStatus:   1,
 		Tracker:          rs[18],
 	}
-	array = append(array, data)
-
-	if len(array) > 1000 {
-		go insertBatch(array[:])
-		array = []NginxLog{}
-	}
+	return data
 }
 
 func maxLength(content string, maxLen int) string {
@@ -158,23 +182,33 @@ func maxLength(content string, maxLen int) string {
 }
 
 func consumer() {
+	var array []NginxLog
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "hadoop104.eqxiu.com:9092,hadoop105.eqxiu.com:9092,hadoop106.eqxiu.com:9092",
-		"group.id":          "kafka-to-mysql",
+		"bootstrap.servers": servers,
+		"group.id":          group_id,
 		"auto.offset.reset": "smallest"})
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = consumer.SubscribeTopics([]string{"gateway_original_show"}, nil)
+	err = consumer.SubscribeTopics([]string{topic}, nil)
+	if err != nil{
+		panic(err)
+	}
 	defer consumer.Close()
 
 	for {
 		ev := consumer.Poll(0)
 		switch e := ev.(type) {
 		case *kafka.Message:
-			onMessage(e)
+			data := onMessage(e)
+			array = append(array, data)
+			if len(array) > 1000 {
+				log.Println(">1000")
+				insertBatch(array[:])
+				array = nil
+			}
 		case kafka.PartitionEOF:
 			fmt.Printf("%% Reached %v\n", e)
 		case kafka.Error:
@@ -182,12 +216,22 @@ func consumer() {
 			break
 		default:
 			//fmt.Printf("Ignored %v\n", e)
-			//break
 		}
 	}
 
 
 }
+
+
+
 func main() {
+	//defer profile.Start(profile.MemProfile).Stop()
+
 	consumer()
+	//go consumer()
+	//go consumer()
+	//var w = sync.WaitGroup{}
+	//w.Add(1)
+	//log.Println("start ...")
+	//w.Wait()
 }

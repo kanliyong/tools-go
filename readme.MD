@@ -7,6 +7,7 @@ env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o output main.go
 
 ```bash
 env CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o output main.go
+go build -gcflags=all="-N -l" main.go
 ```
 
 ## 依赖

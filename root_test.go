@@ -10,6 +10,5 @@ import (
 // }
 
 func TestMongo(t *testing.T) {
-	tt := parseTime("10/Jun/2020:23:55:50 +0800")
-	println(tt)
+	println(1)
 }

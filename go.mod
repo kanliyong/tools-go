@@ -8,6 +8,8 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/mattn/go-sqlite3 v1.14.4 // indirect
+	github.com/pkg/profile v1.5.0 // indirect
+	github.com/prometheus/client_golang v0.9.3
 	github.com/spf13/cobra v1.1.1 // indirect
 	go.mongodb.org/mongo-driver v1.4.2
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2 // indirect
