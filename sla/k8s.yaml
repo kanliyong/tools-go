@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: svc-sw-sla
+    service.kubernetes.io/qcloud-loadbalancer-internal-subnetid: subnet-2tdvvzeh
+  name: svc-sw-sla
+  namespace: eqxiu-ops
+spec:
+  ports:
+    - name: port
+      protocol: TCP
+      port: 9123
+      targetPort: 9123
+  selector:
+    qcloud-app: sw-sla
+  sessionAffinity: None
+  type: LoadBalancer
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: sw-sla
+  labels:
+    qcloud-app: sw-sla
+  name: sw-sla
+  namespace: eqxiu-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      qcloud-app: sw-sla
+  template:
+    metadata:
+      labels:
+        qcloud-app: sw-sla
+    spec:
+      containers:
+      - name: sw-sla
+        image: ccr.ccs.tencentyun.com/eqxiu/sla
+        imagePullPolicy: Always
+        ports:
+        - name: port
+          containerPort: 9123
+        livenessProbe:
+          tcpSocket:
+            port: 9123
+        readinessProbe:
+          tcpSocket:
+            port: 9123
+        resources:
+          limits:
+            memory: 56Mi
+          requests:
+            memory: 56Mi
+        securityContext:
+          privileged: false
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: qcloudregistrykey
+      - name: tencenthubkey
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 600
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
