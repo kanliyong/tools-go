@@ -38,12 +38,12 @@ var ClusterArray = []*Cluster{
 		kubeconfig: "cls-azglyxmh-config",
 		env:        "release-b",
 	},
-	&Cluster{
-		name:       "release-c",
-		tkeId:      "cls-0rxd0x77",
-		kubeconfig: "cls-0rxd0x77-config",
-		env:        "release-c",
-	},
+	//&Cluster{
+	//	name:       "release-c",
+	//	tkeId:      "cls-0rxd0x77",
+	//	kubeconfig: "cls-0rxd0x77-config",
+	//	env:        "release-c",
+	//},
 	&Cluster{
 		name:       "release-d",
 		tkeId:      "cls-cz6628et",

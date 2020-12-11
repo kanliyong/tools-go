@@ -85,7 +85,7 @@ func ScaleZero(cluster *Cluster, svc string, f bool) {
 func doScale(args []string) {
 	output, err := exec.Command("kubectl", args...).Output()
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	fmt.Println(string(output))
 }
