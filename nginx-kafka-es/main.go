@@ -11,23 +11,12 @@ import (
 	"github.com/segmentio/kafka-go"
 	"go.elastic.co/apm"
 	"log"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
-
-/**
-docker build -t ccr.ccs.tencentyun.com/eqxiu/nginx-kafaka-exporter -f Dockerfile .
-docker push ccr.ccs.tencentyun.com/eqxiu/nginx-kafaka-exporter
-
-
-
-./nginx-kafaka-exporter -servers=hadoop104.eqxiu.com:9092,hadoop105.eqxiu.com:9092,hadoop106.eqxiu.com:9092 \
--group_id=gateway_original_test\
--topic=gateway_original
-
-*/
 
 func parseTime(input string) time.Time {
 	t, err := time.Parse("02/Jan/2006:15:04:05 -0700", input)
@@ -141,7 +130,7 @@ func main() {
 
 	for i := 1; i <= numIndexers; i++ {
 		idx, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
-			Index:      fmt.Sprintf("waf_nginx_log_%s", time.Now().Format("2006-01-02")),
+			Index:      url.QueryEscape("<waf_nginx_log_{now/d}>"),
 			Client:     es,
 			NumWorkers: numWorkers,
 			FlushBytes: int(flushBytes),
@@ -194,7 +183,7 @@ func main() {
 		for {
 			select {
 			case <-reporter.C:
-				fmt.Print(report(consumers, indexers))
+				//fmt.Print(report(consumers, indexers))
 			}
 		}
 	}()
