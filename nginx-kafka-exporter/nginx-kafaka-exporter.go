@@ -16,7 +16,7 @@ import (
 )
 
 /**
-docker build -t ccr.ccs.tencentyun.com/eqxiu/nginx-kafaka-exporter -f nginx-kafaka-exporter.Dockerfile .
+docker build -t ccr.ccs.tencentyun.com/eqxiu/nginx-kafaka-exporter -f Dockerfile .
 docker push ccr.ccs.tencentyun.com/eqxiu/nginx-kafaka-exporter
 
 

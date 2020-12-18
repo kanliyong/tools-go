@@ -19,12 +19,10 @@ func filterClusters(env string) []*Cluster {
 	switch env {
 	case "all":
 		return ClusterArray
-	case "test":
-		return ClusterArray[:2]
 	case "stage":
-		return ClusterArray[2:4]
+		return ClusterArray[:2]
 	case "product":
-		return ClusterArray[4:]
+		return ClusterArray[2:]
 	}
 	return ClusterArray
 }
