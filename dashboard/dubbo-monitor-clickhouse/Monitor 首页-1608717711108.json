@@ -1,0 +1,382 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 14,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "cacheTimeout": null,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "ClickHouse",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.4",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "database": "app",
+          "dateLoading": false,
+          "dateTimeColDataType": "create_at",
+          "dateTimeType": "DATETIME",
+          "datetimeLoading": false,
+          "format": "time_series",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT     (intDiv(toUInt32(create_at), 60) * 60) * 1000 as t, \n\nsum(success) / 60 as success \nFROM app.db_logs WHERE create_at >= toDateTime($from)\nGROUP BY t \nORDER BY t\n",
+          "rawQuery": "SELECT     (intDiv(toUInt32(create_at), 60) * 60) * 1000 as t,   sum(success) / 60 as success  FROM app.db_logs WHERE create_at >= toDateTime(1568253267) GROUP BY t  ORDER BY t",
+          "refId": "A",
+          "round": "0s",
+          "table": "db_logs",
+          "tableLoading": false
+        },
+        {
+          "dateTimeType": "DATETIME",
+          "format": "time_series",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "hide": true,
+          "intervalFactor": 1,
+          "query": "SELECT     (intDiv(toUInt32(create_at), 60) * 60) * 1000 as t, \n\nsum(failure) as failure\nFROM app.db_logs WHERE create_at >= toDateTime($from)\nGROUP BY t \nORDER BY t\n",
+          "rawQuery": "SELECT     (intDiv(toUInt32(create_at), 60) * 60) * 1000 as t,   sum(failure) as failure FROM app.db_logs WHERE create_at >= toDateTime(1567755235) GROUP BY t  ORDER BY t",
+          "refId": "B",
+          "round": "0s"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "全网 成功请求数  / 每秒 (QPS) ",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "cacheTimeout": null,
+      "columns": [],
+      "datasource": "ClickHouse",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 17,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "links": [],
+      "pageSize": null,
+      "pluginVersion": "6.1.3",
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "database": "app",
+          "dateLoading": false,
+          "dateTimeColDataType": "create_at",
+          "dateTimeType": "DATETIME",
+          "datetimeLoading": false,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT\n    service,\n    method,\n    sum(failure) as c\nFROM $table\nWHERE create_at >= toDateTime($from) and (provider is not null and provider != '')\ngroup by service ,method\norder by c desc limit 25\n",
+          "rawQuery": "SELECT     service,     method,     sum(failure) as c FROM app.db_logs WHERE create_at >= toDateTime(1568253267) and (provider is not null and provider != '') group by service ,method order by c desc limit 25",
+          "refId": "A",
+          "round": "0s",
+          "table": "db_logs",
+          "tableLoading": false
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "请求失败总数 TOP 25",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "cacheTimeout": null,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "ClickHouse",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "hiddenSeries": false,
+      "id": 5,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "max": true,
+        "min": true,
+        "show": true,
+        "sort": "avg",
+        "sortDesc": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.4",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "failure",
+          "color": "#F2495C"
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "database": "app",
+          "dateLoading": false,
+          "dateTimeColDataType": "create_at",
+          "dateTimeType": "DATETIME",
+          "datetimeLoading": false,
+          "format": "time_series",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "hide": true,
+          "intervalFactor": 1,
+          "query": "SELECT     (intDiv(toUInt32(create_at), 60) * 60) * 1000 as t, \n\nsum(success) as success\nFROM app.db_logs WHERE create_at >= toDateTime($from)\nGROUP BY t \nORDER BY t\n",
+          "rawQuery": "SELECT     (intDiv(toUInt32(create_at), 60) * 60) * 1000 as t,   sum(success) as success FROM app.db_logs WHERE create_at >= toDateTime(1567755241) GROUP BY t  ORDER BY t",
+          "refId": "A",
+          "round": "0s",
+          "table": "db_logs",
+          "tableLoading": false
+        },
+        {
+          "dateTimeType": "DATETIME",
+          "format": "time_series",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT\n    t,\n    groupArray((service, c)) AS groupArr\nFROM\n(\n    SELECT\n        (intDiv(toUInt32(create_at), 60) * 60) * 1000 AS t,\n        service,\n        sum(failure/60) c\n    FROM app.db_logs\n    WHERE create_at >= toDateTime($from) \n    GROUP BY\n        t,\n        service\n    ORDER BY\n        t,\n        service\n)\nGROUP BY t\nORDER BY t",
+          "rawQuery": "SELECT     t,     groupArray((service, c)) AS groupArr FROM (     SELECT         (intDiv(toUInt32(create_at), 60) * 60) * 1000 AS t,         service,         sum(failure/60) c     FROM app.db_logs     WHERE create_at >= toDateTime(1568253267)      GROUP BY         t,         service     ORDER BY         t,         service ) GROUP BY t ORDER BY t",
+          "refId": "B",
+          "round": "0s"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "全网 失败请求总数 (每分钟)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "",
+  "title": "Monitor 首页",
+  "uid": "7aBpAncZk",
+  "version": 11
+}
