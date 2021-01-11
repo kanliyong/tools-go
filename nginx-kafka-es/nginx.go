@@ -25,6 +25,7 @@ type NginxLog struct {
 	UpstreamStatus   int
 	Tracker          string
 	TraceId          string
+	SWURI            string `json:"sw_url"`
 }
 
 func parseTime(input string) time.Time {
@@ -73,6 +74,7 @@ func onMessage(e *kafka.Message) ([]byte, error) {
 		UpstreamStatus:   1,
 		Tracker:          rs[18],
 		TraceId:          TraceId,
+		SWURI:            "https://sw8.eff.eqxiu.cc/trace?traceId=" + TraceId,
 	}
 	return json.Marshal(data)
 }
