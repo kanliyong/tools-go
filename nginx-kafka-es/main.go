@@ -2,106 +2,40 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/dustin/go-humanize"
-	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esutil"
-	"github.com/segmentio/kafka-go"
-	"go.elastic.co/apm"
 	"log"
 	"net/url"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
-)
 
-func parseTime(input string) time.Time {
-	t, err := time.Parse("02/Jan/2006:15:04:05 -0700", input)
-	if err != nil {
-		return time.Now()
-	}
-	return t
-}
+	"github.com/dustin/go-humanize"
+	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esutil"
+)
 
 var (
-	servers string
-	group_id string
-	topic string
+	servers      string
+	group_id     string
+	topic        string
 	indexerError error
-	wg  sync.WaitGroup
+	wg           sync.WaitGroup
 )
 
-func init(){
+func init() {
 
 	flag.StringVar(&servers,
 		"servers",
 		"hadoop104.eqxiu.com:9092",
 		"kafka bootstrap servers")
-	flag.StringVar(&group_id, "group_id","gateway_original_mysql", "kafka consumer group id")
-	flag.StringVar(&topic, "topic","gateway_original", "kafka consumer topic")
+	flag.StringVar(&group_id, "group_id", "gateway_original_mysql", "kafka consumer group id")
+	flag.StringVar(&topic, "topic", "gateway_original", "kafka consumer topic")
 	flag.Parse()
 
 	log.Printf("group_id = %s", group_id)
 	log.Printf("topic = %s", topic)
 	log.Printf("servers = %s", servers)
-}
-
-
-type NginxLog struct {
-	RemoteIp         string
-	JessionId        string
-	Host             string
-	Method           string
-	Uri              string
-	Code             int
-	RequestTime      float64
-	ResponseBodySize float64
-	Time             time.Time
-	Agent            string
-	Referer          string
-	UpstreamAddr     string
-	UpstreamStatus   int
-	Tracker          string
-}
-
-func onMessage(e *kafka.Message) ([]byte, error) {
-
-	s := string(e.Value)
-	rs := strings.Split(s, "#|#")
-
-	code, _ := strconv.Atoi(rs[8])
-	requestTime, _ := strconv.ParseFloat(rs[11], 8)
-	ResponseBodySize, _ := strconv.ParseFloat(rs[15], 8)
-
-	data := NginxLog{
-		RemoteIp:         rs[0],
-		JessionId:        rs[2],
-		Host:             rs[3],
-		Method:           rs[4],
-		Uri:              rs[5],
-		Code:             code,
-		RequestTime:      requestTime,
-		ResponseBodySize: ResponseBodySize,
-		Time:             parseTime(rs[1]),
-		Agent:            rs[9],
-		Referer:          rs[10],
-		UpstreamAddr:     rs[12],
-		UpstreamStatus:   1,
-		Tracker:          rs[18],
-	}
-	return json.Marshal(data)
-}
-
-func maxLength(content string, maxLen int) string {
-	asRunes := []rune(content)
-	if len(asRunes) > maxLen {
-		return string(asRunes[:maxLen])
-	} else {
-		return content
-	}
 }
 
 func main() {
@@ -125,7 +59,7 @@ func main() {
 	numConsumers := 10
 	numWorkers := 0
 	flushBytes := 0
-	var indexers  []esutil.BulkIndexer
+	var indexers []esutil.BulkIndexer
 	var consumers []*Consumer
 
 	for i := 1; i <= numIndexers; i++ {
@@ -136,15 +70,15 @@ func main() {
 			FlushBytes: int(flushBytes),
 			// Elastic APM: Instrument the flush operations and capture errors
 			OnFlushStart: func(ctx context.Context) context.Context {
-				txn := apm.DefaultTracer.StartTransaction("Bulk", "indexing")
-				return apm.ContextWithTransaction(ctx, txn)
+				log.Printf("start flushing")
+				return ctx
 			},
 			OnFlushEnd: func(ctx context.Context) {
-				apm.TransactionFromContext(ctx).End()
+				log.Printf("end flushing")
 			},
 			OnError: func(ctx context.Context, err error) {
 				indexerError = err
-				apm.CaptureError(ctx, err).Send()
+				log.Printf("flushing error %s", err)
 			},
 		})
 		if err != nil {
@@ -161,10 +95,10 @@ func main() {
 					"hadoop105.eqxiu.com:9092",
 					"hadoop106.eqxiu.com:9092",
 				},
-				TopicName: topic,
-				GroupID: group_id,
+				TopicName:       topic,
+				GroupID:         group_id,
 				MessageCallback: onMessage,
-				Indexer:   indexers[i%numIndexers]})
+				Indexer:         indexers[i%numIndexers]})
 	}
 
 	for _, c := range consumers {
@@ -177,13 +111,13 @@ func main() {
 		}(c)
 	}
 
-	reporter := time.NewTicker(500 * time.Millisecond)
+	reporter := time.NewTicker(5000 * time.Millisecond)
 	defer reporter.Stop()
 	go func() {
 		for {
 			select {
 			case <-reporter.C:
-				//fmt.Print(report(consumers, indexers))
+				fmt.Print(report(consumers, indexers))
 			}
 		}
 	}()
@@ -191,7 +125,6 @@ func main() {
 	wg.Wait()
 
 }
-
 
 func report(
 	consumers []*Consumer,
@@ -235,7 +168,6 @@ func report(
 	}
 	fmt.Fprint(&b, "┓")
 	currRow++
-
 
 	for i, c := range consumers {
 		fmt.Fprintf(&b, "\033[%d;0H", currRow)

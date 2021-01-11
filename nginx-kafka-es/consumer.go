@@ -13,15 +13,13 @@ import (
 
 	"github.com/segmentio/kafka-go"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 )
 
 type Consumer struct {
-	Brokers []string
-	TopicName string
-	GroupID string
+	Brokers         []string
+	TopicName       string
+	GroupID         string
 	MessageCallback func(message *kafka.Message) ([]byte, error)
 
 	Indexer esutil.BulkIndexer
@@ -55,32 +53,29 @@ func (c *Consumer) Run(ctx context.Context) (err error) {
 			return fmt.Errorf("reader: %s", err)
 		}
 		// log.Printf("%v/%v/%v:%s\n", msg.Topic, msg.Partition, msg.Offset, string(msg.Value))
-		value , err := c.MessageCallback(&msg)
-		//log.Println(string(value))
-		if err := c.Indexer.Add(ctx,
-			esutil.BulkIndexerItem{
-				Action: "create",
-				Body:   bytes.NewReader(value),
-				OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
-					//log.Printf("Indexed %s/%s", res.Index, res.DocumentID)
-				},
-				OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
-					if err != nil {
-						apm.CaptureError(ctx, err).Send()
-					} else {
-						if res.Error.Type != "" {
-							log.Printf("%s:%s", res.Error.Type, res.Error.Reason)
-							// apm.CaptureError(ctx, fmt.Errorf("%s:%s", res.Error.Type, res.Error.Reason)).Send()
-						} else {
-							log.Printf("%s/%s %s (%d)", res.Index, res.DocumentID, res.Result, res.Status)
-							// apm.CaptureError(ctx, fmt.Errorf("%s/%s %s (%d)", res.Index, res.DocumentID, res.Result, res.Status)).Send()
-						}
+		value, err := c.MessageCallback(&msg)
 
+		item := esutil.BulkIndexerItem{
+			Action: "create",
+			Body:   bytes.NewReader(value),
+			OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
+				// log.Printf("Indexed %s/%s", res.Index, res.DocumentID)
+			},
+			OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
+				if err != nil {
+					log.Printf("failure %s", err)
+				} else {
+					if res.Error.Type != "" {
+						log.Printf("%s:%s", res.Error.Type, res.Error.Reason)
+					} else {
+						log.Printf("%s/%s %s (%d)", res.Index, res.DocumentID, res.Result, res.Status)
 					}
-				},
-			}); err != nil {
-			apm.DefaultTracer.NewError(err).Send()
-			return fmt.Errorf("indexer: %s", err)
+
+				}
+			},
+		}
+		if err := c.Indexer.Add(ctx, item); err != nil {
+			log.Printf("indexer: %s", err)
 		}
 	}
 	c.reader.Close()
