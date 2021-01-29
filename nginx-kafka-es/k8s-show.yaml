@@ -23,6 +23,7 @@ spec:
         args:
           - -group_id=kafka-to-mysql
           - -topic=gateway_original_show
+          - -numWorker=10
         imagePullPolicy: Always
         resources:
           limits:

@@ -23,6 +23,7 @@ spec:
         args:
           - -group_id=gateway_original_mysql
           - -topic=gateway_original
+          - -numWorker=10
         imagePullPolicy: Always
         resources:
           limits:
